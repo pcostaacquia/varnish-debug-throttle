@@ -33,6 +33,8 @@ services:
     volumes:
       - ./default.vcl:/etc/varnish/default.vcl:ro
       - workdir:/var/lib/varnish
+    depends_on:
+      - nginx
     ports:
       - "8081:80"
     networks:
@@ -44,7 +46,12 @@ services:
      - "8089:8089"
     volumes:
       - ./:/mnt/locust
+    depends_on:
+      - nginx
     command: -f /mnt/locust/locustfile_fast.py -H http://master:8089
+    networks:
+      - backend
+
 
   locust-slow:
     image: locustio/locust
@@ -52,7 +59,11 @@ services:
      - "8090:8090"
     volumes:
       - ./:/mnt/locust
+    depends_on:
+      - nginx
     command: -f /mnt/locust/locustfile_slow.py -H http://master:8089 -P 8090
+    networks:
+      - backend
 
 volumes:
   workdir:
